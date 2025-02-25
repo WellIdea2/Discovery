@@ -1,0 +1,2 @@
+org\discovery\DiscoveryServiceApplication.class
+org\discovery\config\RabbitMQConfig.class
