@@ -1,4 +1,4 @@
-package org.discovery.config;
+package com.floxie.discovery.config;
 
 import org.commons.rabbitmq.RabbitMqUserQueues;
 import org.springframework.amqp.core.Queue;
