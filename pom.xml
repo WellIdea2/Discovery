@@ -20,11 +20,18 @@
         <floxie.commons.version>1.0.1</floxie.commons.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
-            <groupId>org.floxie</groupId>
-            <artifactId>commons</artifactId>
-            <version>${floxie.commons.version}</version>
+            <groupId>com.github.WellIdea2</groupId>
+            <artifactId>Commons</artifactId>
+            <version>-SNAPSHOT</version>
         </dependency>
 
         <dependency>
