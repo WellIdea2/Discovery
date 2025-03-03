@@ -17,12 +17,14 @@ public class RabbitMQQueueBoater implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-    Queue queue1 = new Queue(RabbitMqUserQueues.RECORD_USER_CREATE, false);
-    Queue queue2 = new Queue(RabbitMqUserQueues.RECORD_USER_DELETION, false);
-    Queue queue3 = new Queue(RabbitMqUserQueues.CUSTOM_FOOD_USER_DELETION, false);
+    Queue userDeletionNotifyCustomFoodQueue = new Queue(RabbitMqUserQueues.USER_DELETION_NOTIFY_CUSTOM_FOOD, false);
+    Queue userDeletionNotifyUserDetailsQueue = new Queue(RabbitMqUserQueues.USER_DELETION_NOTIFY_USER_DETAILS, false);
+    Queue userDeletionNotifyRecordQueue = new Queue(RabbitMqUserQueues.USER_DELETION_NOTIFY_RECORD, false);
+    Queue userDetailsCreationNotifyRecordQueue = new Queue(RabbitMqUserQueues.USER_DETAILS_CREATION_NOTIFY_RECORD, false);
 
-    amqpAdmin.declareQueue(queue1);
-    amqpAdmin.declareQueue(queue2);
-    amqpAdmin.declareQueue(queue3);
+    amqpAdmin.declareQueue(userDeletionNotifyCustomFoodQueue);
+    amqpAdmin.declareQueue(userDeletionNotifyUserDetailsQueue);
+    amqpAdmin.declareQueue(userDeletionNotifyRecordQueue);
+    amqpAdmin.declareQueue(userDetailsCreationNotifyRecordQueue);
   }
 }
