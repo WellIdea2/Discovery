@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "5678:80"
+    environment:
+      - PMA_ARBITRARY=0
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+    restart: always
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql
+    container_name: mysql-container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: example
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    depends_on:
+      - zipkin
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    depends_on:
+      - zipkin
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - zipkin
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    depends_on:
+      - prometheus
+
+  discovery-server:
+    image: svetlindimitrov606/floxie-discovery-service
+    container_name: discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
+      - rabbitmq
+    ports:
+      - "8761:8761"
+
+  gateway-server:
+    image: svetlindimitrov606/floxie-gateway-service
+    container_name: gateway-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+      - zipkin
+
+  auth-server:
+    image: svetlindimitrov606/floxie-authentication-service
+    container_name: auth-server
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql
+      - gateway-server
+
+  user-details-server:
+    image: svetlindimitrov606/floxie-user-details-service
+    container_name: user-details-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql
+      - gateway-server
+
+  nutri-guide-server:
+    restart: always
+    image: svetlindimitrov606/floxie-nutri-guide-service
+    container_name: nutri-guide-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql
+      - gateway-server
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
